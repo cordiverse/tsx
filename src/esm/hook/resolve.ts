@@ -727,7 +727,8 @@ const resolveTsPaths = async (
 		tsconfigPathAliasSpecifier
 		// TS path alias
 		&& hookData.parsedTsconfig
-		&& !isParentDependency(context.parentURL)
+		// https://github.com/privatenumber/tsx/issues/159#issuecomment-1902179308
+		// && !isParentDependency(context.parentURL)
 	) {
 		const possiblePaths = resolvePathAlias(hookData.parsedTsconfig, specifier);
 		log(3, 'resolveTsPaths', {
@@ -768,7 +769,8 @@ const resolveTsPathsSync = (
 		tsconfigPathAliasSpecifier
 		// TS path alias
 		&& hookData.parsedTsconfig
-		&& !isParentDependency(context.parentURL)
+		// https://github.com/privatenumber/tsx/issues/159#issuecomment-1902179308
+		// && !isParentDependency(context.parentURL)
 	) {
 		const possiblePaths = resolvePathAlias(hookData.parsedTsconfig, specifier);
 		log(3, 'resolveTsPathsSync', {
