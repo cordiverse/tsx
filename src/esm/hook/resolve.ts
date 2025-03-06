@@ -212,7 +212,8 @@ const resolveTsPaths: ResolveHook = async (
 		!requestAcceptsQuery(specifier)
 		// TS path alias
 		&& tsconfigPathsMatcher
-		&& !context.parentURL?.includes('/node_modules/')
+		// https://github.com/privatenumber/tsx/issues/159#issuecomment-1902179308
+		// && !context.parentURL?.includes('/node_modules/')
 	) {
 		const possiblePaths = tsconfigPathsMatcher(specifier);
 		for (const possiblePath of possiblePaths) {
