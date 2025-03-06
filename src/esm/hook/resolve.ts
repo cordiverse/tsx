@@ -1,8 +1,9 @@
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import type {
-	ResolveHook,
-	ResolveHookContext,
+import {
+	builtinModules,
+	type ResolveHook,
+	type ResolveHookContext,
 } from 'node:module';
 import type { PackageJson } from 'type-fest';
 import { readJsonFile } from '../../utils/read-json-file.js';
@@ -212,8 +213,9 @@ const resolveTsPaths: ResolveHook = async (
 		!requestAcceptsQuery(specifier)
 		// TS path alias
 		&& tsconfigPathsMatcher
-		// https://github.com/privatenumber/tsx/issues/159#issuecomment-1902179308
+		// https://github.com/privatenumber/tsx/issues/159
 		// && !context.parentURL?.includes('/node_modules/')
+		&& !builtinModules.includes(specifier)
 	) {
 		const possiblePaths = tsconfigPathsMatcher(specifier);
 		for (const possiblePath of possiblePaths) {

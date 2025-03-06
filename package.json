@@ -1,6 +1,6 @@
 {
 	"name": "@cordiverse/tsx",
-	"version": "4.19.3",
+	"version": "4.19.3-fix.3",
 	"description": "TypeScript Execute (tsx): Node.js enhanced with esbuild to run TypeScript & ESM files",
 	"keywords": [
 		"cli",
@@ -57,6 +57,7 @@
 	"packageManager": "pnpm@9.11.0",
 	"homepage": "https://tsx.is",
 	"scripts": {
+		"publish": "pnpm prepack && pnpm publish --access public --tag latest",
 		"build": "pkgroll --minify",
 		"lint": "lintroll --node --cache --ignore-pattern 'docs/*.md' .",
 		"type-check": "tsc",
