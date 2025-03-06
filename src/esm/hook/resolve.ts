@@ -1,10 +1,11 @@
 import path from 'node:path';
 import { existsSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import type {
-	ResolveHook,
-	ResolveHookContext,
-	ResolveHookSync,
+import {
+	builtinModules,
+	type ResolveHook,
+	type ResolveHookContext,
+	type ResolveHookSync,
 } from 'node:module';
 import type { PackageJson } from 'type-fest';
 import { resolvePathAlias } from 'get-tsconfig';
@@ -727,8 +728,9 @@ const resolveTsPaths = async (
 		tsconfigPathAliasSpecifier
 		// TS path alias
 		&& hookData.parsedTsconfig
-		// https://github.com/privatenumber/tsx/issues/159#issuecomment-1902179308
+		// https://github.com/privatenumber/tsx/issues/159
 		// && !isParentDependency(context.parentURL)
+		&& !builtinModules.includes(specifier)
 	) {
 		const possiblePaths = resolvePathAlias(hookData.parsedTsconfig, specifier);
 		log(3, 'resolveTsPaths', {
@@ -769,8 +771,9 @@ const resolveTsPathsSync = (
 		tsconfigPathAliasSpecifier
 		// TS path alias
 		&& hookData.parsedTsconfig
-		// https://github.com/privatenumber/tsx/issues/159#issuecomment-1902179308
+		// https://github.com/privatenumber/tsx/issues/159
 		// && !isParentDependency(context.parentURL)
+		&& !builtinModules.includes(specifier)
 	) {
 		const possiblePaths = resolvePathAlias(hookData.parsedTsconfig, specifier);
 		log(3, 'resolveTsPathsSync', {
