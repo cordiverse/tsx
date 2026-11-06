@@ -60,8 +60,8 @@ export const tsconfig = ({ tsx }: NodeApis) => describe('tsconfig', () => {
 				// Resolves paths - suffix match
 				import 'file/suffix';
 
-				// tsconfig should not apply to dependency
-				import 'tsconfig-should-not-apply';
+				// tsconfig paths apply to ES module dependencies
+				import 'tsconfig-dependency';
 				`,
 
 				'file.ts': '',
@@ -87,7 +87,7 @@ export const tsconfig = ({ tsx }: NodeApis) => describe('tsconfig', () => {
 				console.log('imported');
 				`,
 
-				'node_modules/tsconfig-should-not-apply': {
+				'node_modules/tsconfig-dependency': {
 					'package.json': createPackageJson({
 						exports: {
 							import: './index.mjs',
@@ -95,12 +95,9 @@ export const tsconfig = ({ tsx }: NodeApis) => describe('tsconfig', () => {
 						},
 					}),
 					'index.mjs': `
-					import { expectErrors } from 'expect-errors';
-					expectErrors(
-						[() => import ('prefix/file'), "Cannot find package 'prefix'"],
-						[() => import ('paths-exact-match'), "Cannot find package 'paths-exact-match'"],
-						[() => import ('file'), "Cannot find package 'file'"],
-					);
+					import 'prefix/file';
+					import 'paths-exact-match';
+					import 'file';
 					`,
 					'index.cjs': `
 					const { expectErrors } = require('expect-errors');
@@ -256,6 +253,36 @@ export const tsconfig = ({ tsx }: NodeApis) => describe('tsconfig', () => {
 			});
 		});
 	}
+
+	test('paths do not rewrite builtin modules imported by a dependency', async () => {
+		await using fixture = await createFixture({
+			'package.json': createPackageJson({ type: 'module' }),
+			'tsconfig.json': createTsconfig({
+				compilerOptions: {
+					paths: {
+						'*': ['./src/*'],
+					},
+				},
+			}),
+			'src/fs.ts': 'export const readFileSync = null;',
+			'index.ts': 'import \'dependency\';',
+			'node_modules/dependency': {
+				'package.json': createPackageJson({
+					name: 'dependency',
+					exports: './index.mjs',
+				}),
+				'index.mjs': `
+				import { readFileSync } from 'fs';
+				console.log(typeof readFileSync);
+				`,
+			},
+		});
+
+		const process = await tsx(['index.ts'], fixture.path);
+
+		expect(process.stderr).toBe('');
+		expect(process.stdout).toBe('function');
+	});
 
 	describe('allowJs dependency resolution', () => {
 		// https://github.com/privatenumber/tsx/issues/640
